@@ -17,7 +17,10 @@ func main() {
     e.Use(middleware.Recover())
 
     // Initial Database connection
-    err, db := database.New(config)
+    username := ""
+    password := ""
+    host := ""
+    err, db := database.New(username, password, host)
     if err != nil {
         panic(err)
     }
