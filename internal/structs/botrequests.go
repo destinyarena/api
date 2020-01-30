@@ -1,4 +1,4 @@
-package main
+package structs
 
 type (
     // Bot response to get USER by ID

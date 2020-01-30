@@ -10,7 +10,7 @@ type (
     }
 
     // GET /api/users/get/{discord,faceit,bungie}/{user_id}
-    RespGetUserByID {
+    RespGetUserByID struct {
         Discord  *DiscordUser `json:"discord"`
         Faceit   *FaceitUser  `json:"faceit"`
         Bungie   *BungieUser  `json:"bungie"`
@@ -18,24 +18,42 @@ type (
     }
 
     // POST /api/users/ban
-    ReqUserBan {
+    ReqUserBan struct {
         Discord string `json:"discord"`
         Faceit  string `json:"faceit"`
         Bungie  string `json:"bungie"`
     }
 
     // POST /api/users/unban
-    ReqUserUnban {
+    ReqUserUnban struct {
         *ReqUserBan
     }
 
     // GET /api/users/list
-    RespUserList {
+    RespUserList struct {
         Count  int `json:"count"`
         Users  []*SimpleUser `json:"users"`
     }
 
-    SimpleUser {
+    DiscordUser struct {
+        Id int `json:"id"`
+        Username string `json:"username"`
+        Discriminator string `json:"discriminator"`
+    }
+
+    FaceitUser struct {
+        Id string       `json:"id"`
+        Username string `json:"username"`
+        SkillLevel int  `json:"skilllevel"`
+        Steam string    `json:"steam"`
+    }
+
+    BungieUser struct {
+        Id string `json:"id"`
+        Username string `json:"username"`
+    }
+
+    SimpleUser struct {
         Discord string `json:"discord"`
         Faceit  string `json:"faceit"`
         Bungie  string `json:"bungie"`

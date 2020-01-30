@@ -8,11 +8,6 @@ type (
         Host     string `json:"host"`
     }
 
-    HTTPServer struct {
-        Port string `json:"port"`
-        Host string `json:"host"`
-    }
-
     Secrets struct {
         Discord   string `json:"discord"`
         Faceit    string `json:"faceit"`

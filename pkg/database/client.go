@@ -4,6 +4,7 @@ import (
     "fmt"
     "github.com/jinzhu/gorm"
     _ "github.com/jinzhu/gorm/dialects/mysql"
+)
 
 type DBClient struct {
     Username string
@@ -11,9 +12,9 @@ type DBClient struct {
     Host     string
 }
 
-func (c *DBClient) Connect() (*gron.DB, error) {
-    db, err := grom.Open("mysql", fmt.Sprinf("%s:%s@/(%s)charset=utf8mb4&parseTime=True&loc=Local",c.Username, c.Password, c.Host)
-    return db, err
+func (c *DBClient) Connect() (error, *gorm.DB) {
+    db, err := gorm.Open("mysql", fmt.Sprintf("%s:%s@/(%s)charset=utf8mb4&parseTime=True&loc=Local",c.Username, c.Password, c.Host))
+    return err, db
 }
 
 func New(username, password, host string) *DBClient {
@@ -25,7 +26,7 @@ func New(username, password, host string) *DBClient {
 }
 
 func (c *DBClient) Init() error {
-    db, err := c.Connect()
+    err, db := c.Connect()
     if err != nil {
         return err
     }

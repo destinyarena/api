@@ -1,6 +1,10 @@
+package database
 
+import (
+    "errors"
+)
 
-func (f *Faceit) RegisterUser(NewUser *User) error {
+func (f *DBClient) RegisterUser(NewUser *User) error {
     err, db := f.Connect()
     if err != nil {
         return err

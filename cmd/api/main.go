@@ -1,14 +1,18 @@
 package main
 
 import (
-    "os"
+    "fmt"
     "github.com/labstack/echo/v4"
     "github.com/labstack/echo/v4/middleware"
-    "github.com/arturoguerra/destinyarena-api/internal/router"
+    "github.com/arturoguerra/destinyarena-api/internal/config"
+    "github.com/arturoguerra/destinyarena-api/internal/router/oauth"
     "github.com/arturoguerra/destinyarena-api/pkg/database"
+    "github.com/arturoguerra/destinyarena-api/internal/logging"
 )
 
 func main() {
+    log := logging.New()
+    log.Infoln("Starting Destiny Arena API")
     e := echo.New()
 
     // Logs HTTP Requests
@@ -17,25 +21,15 @@ func main() {
     e.Use(middleware.Recover())
 
     // Initial Database connection
-    username := ""
-    password := ""
-    host := ""
-    err, db := database.New(username, password, host)
-    if err != nil {
-        panic(err)
-    }
+    dbcfg := config.LoadSQLConfig()
+    db := database.New(dbcfg.Username, dbcfg.Password, dbcfg.Host)
+    db.Init()
 
-    // New router in its own thread
-    go func() {
-        router.New(e, db)
-    }()
+    oauth.New(e)
 
-    // HTTP Server PORT Defaults to 8080
-    port := os.Getenv("PORT")
-    if port == "" {
-        port = "8080"
-    }
+    host, port := config.LoadHTTPConfig()
+    log.Infof("Running with HOST: %s PORT: %s", host, port)
 
-    e.Logger.Fatal(e.Start(fmt.Sprinf(":%s", port)))
+    e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", host, port)))
 
 }
