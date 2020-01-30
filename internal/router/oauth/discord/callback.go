@@ -25,6 +25,12 @@ type (
         Scope        string `json:"scope"`
     }
 
+    Response struct {
+        User      *User  `json:"user"`
+        Token     string `json:"token"`
+        TokenType string `json:"token_type"`
+    }
+
     User struct {
         ID            string `json:"id"`
         Username      string `json:"username"`
@@ -32,14 +38,14 @@ type (
     }
 )
 
-func getUser(p *RespOAuthPayload) (User, error) {
+func getUser(p *RespOAuthPayload) (*User, error) {
     client := new(http.Client)
     authtoken := fmt.Sprintf("%s %s", p.TokenType, p.AccessToken)
     log.Infoln(authtoken)
 
     req, err := http.NewRequest("GET", fmt.Sprintf("%s/v6/users/@me", cfg.BaseURL), nil)
     if err != nil {
-        return User{}, err
+        return nil, err
     }
 
     req.Header.Set("Authorization", authtoken)
@@ -48,7 +54,7 @@ func getUser(p *RespOAuthPayload) (User, error) {
     resp, err := client.Do(req)
     if err != nil {
         log.Error(err)
-        return User{}, err
+        return nil, err
     }
 
     defer resp.Body.Close()
@@ -56,23 +62,24 @@ func getUser(p *RespOAuthPayload) (User, error) {
     userbody, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         log.Error(err)
-        return User{}, err
+        return nil, err
     }
 
     var user User
     json.Unmarshal(userbody, &user)
 
-    return user, nil
+
+    return &user, nil
 }
 
-func getToken(p *ReqPayload) (RespOAuthPayload, error) {
+func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
     client := new(http.Client)
     OAuth2URL := fmt.Sprintf("%s/oauth2/token?grant_type=%s&code=%s&redirect_uri=%s&scope=%s", cfg.BaseURL, "authorization_code", p.Code, urlsafe(cfg.RedirectURI), cfg.Scope)
 
     req, err := http.NewRequest("POST", OAuth2URL, nil)
     if err != nil {
         log.Error(err)
-        return RespOAuthPayload{}, err
+        return nil, err
     }
 
     creds := b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Discord))
@@ -82,7 +89,7 @@ func getToken(p *ReqPayload) (RespOAuthPayload, error) {
     resp, err := client.Do(req)
     if err != nil {
         log.Error(err)
-        return RespOAuthPayload{}, err
+        return nil, err
     }
 
     defer resp.Body.Close()
@@ -90,17 +97,17 @@ func getToken(p *ReqPayload) (RespOAuthPayload, error) {
     authBody, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         log.Error(err)
-        return RespOAuthPayload{}, err
+        return nil, err
     }
 
     if resp.StatusCode != 200 {
-        return RespOAuthPayload{}, errors.New("Invalid error code")
+        return nil, errors.New("Invalid error code")
     }
 
     var authPayload RespOAuthPayload
     json.Unmarshal(authBody, &authPayload)
 
-    return authPayload, nil
+    return &authPayload, nil
 }
 
 func Callback(c echo.Context) (err error) {
@@ -119,10 +126,16 @@ func Callback(c echo.Context) (err error) {
         return c.String(http.StatusInternalServerError, "Well rip discord")
     }
 
-    user, err := getUser(&authPayload)
+    user, err := getUser(authPayload)
     if err != nil {
         return c.String(http.StatusInternalServerError, "Fuck me")
     }
 
-    return c.JSON(http.StatusOK, user)
+    response := &Response{
+        Token:     authPayload.AccessToken,
+        TokenType: authPayload.TokenType,
+        User:      user,
+    }
+
+    return c.JSON(http.StatusOK, response)
 }

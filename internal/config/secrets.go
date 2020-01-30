@@ -11,13 +11,13 @@ func LoadSecrets() *structs.Secrets {
     faceit  := os.Getenv("SECRET_FACEIT")
     bungie  := os.Getenv("SECRET_BUNGIE")
     jwt     := os.Getenv("SECRET_JWT")
-    apikey  := os.Getenv("SECRET_APIKEY")
+    apikey  := os.Getenv("SECRET_API_KEY")
 
     return &structs.Secrets{
-        Discord: discord,
-        Faceit:  faceit,
-        Bungie:  bungie,
-        JWTSecret:     jwt,
-        APIKey:  apikey,
+        Discord:   discord,
+        Faceit:    faceit,
+        Bungie:    bungie,
+        JWTSecret: jwt,
+        APIKey:    apikey,
     }
 }

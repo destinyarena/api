@@ -8,7 +8,9 @@ import (
 var log = logrus.New()
 
 func New() *logrus.Logger {
+    level := LoadLoggingLevel()
     fHook := filename.NewHook()
     log.AddHook(fHook)
+    log.SetLevel(level)
     return log
 }

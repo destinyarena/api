@@ -2,7 +2,8 @@ package faceit
 
 import (
     "fmt"
-    "bytes"
+    //"bytes"
+    "errors"
     "net/http"
     "io/ioutil"
     "encoding/json"
@@ -24,40 +25,40 @@ type (
 
     RespOAuthPayload struct {
         AccessToken  string `json:"access_token"`
+        TokenType    string `json:"token_type"`
         RefreshToken string `json:"refresh_token"`
         ExpiresIn    string `json:"expires_in"`
         IdToken      string `json:"id_token"`
         Scope        string `json:"scope"`
     }
 
+    Response struct {
+        TokenType string `json:"token_type"`
+        Token     string `json:"token"`
+        User      *User  `json:"user"`
+    }
+
     User struct {
-        PlayerID string `json:"player_id"`
+        PlayerID string `json:"guid"`
         Nickname string `json:"nickname"`
     }
 )
 
-func getToken(p *ReqPayload) (RespOAuthPayload, error) {
+func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    client := new(http.Client)
-   OAuth2URL := fmt.Sprintf("%s/auth/v1/oauth/token", cfg.OAuthURL)
-   authheader := b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Faceit))
 
-   body := &ReqOAuthPayload{
-       Code: p.Code,
-       GrantType: "authorization_code",
-   }
+   authheader := fmt.Sprintf("Basic %s", b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Faceit)))
+   authurl := fmt.Sprintf("%s/auth/v1/oauth/token?grant_type=authorization_code&code=%s",cfg.BaseAPI ,p.Code)
 
-   bytesbody, err := json.Marshal(body)
+
+   req, err := http.NewRequest("POST", authurl, nil)
    if err != nil {
        log.Error(err)
-       return RespOAuthPayload{}, err
+       return nil, err
    }
 
-
-   req, err := http.NewRequest("POST", OAuth2URL, bytes.NewBuffer(bytesbody))
-   if err != nil {
-       log.Error(err)
-       return RespOAuthPayload{}, err
-   }
+   log.Debugln(authheader)
+   log.Debugln(authurl)
 
    req.Header.Set("Authorization", authheader)
    req.Header.Set("Content-Type", "application/json")
@@ -65,7 +66,13 @@ func getToken(p *ReqPayload) (RespOAuthPayload, error) {
    resp, err := client.Do(req)
    if err != nil {
        log.Error(err)
-       return RespOAuthPayload{}, err
+       return nil, err
+   }
+
+   if resp.StatusCode != 200 {
+       err = errors.New("Server didn't Respond with a 200")
+       log.Error(err)
+       return nil, err
    }
 
    defer resp.Body.Close()
@@ -73,25 +80,25 @@ func getToken(p *ReqPayload) (RespOAuthPayload, error) {
    authBody, err := ioutil.ReadAll(resp.Body)
    if err != nil {
        log.Error(err)
-       return RespOAuthPayload{}, err
+       return nil, err
    }
-
-   log.Infoln(string(authBody))
 
    var payload RespOAuthPayload
    json.Unmarshal(authBody, &payload)
+   log.Debugln(payload)
 
-   return payload, nil
+   return &payload, nil
 }
 
-func getProfile(p *RespOAuthPayload) (User, error) {
+func getProfile(p *RespOAuthPayload) (*User, error) {
    client := new(http.Client)
-   authheader := b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Faceit))
-   userinfourl := fmt.Sprintf("%s/auth/v1/resources/userinfo")
+
+   authheader := fmt.Sprintf("Bearer %s", p.AccessToken)
+   userinfourl := fmt.Sprintf("%s/auth/v1/resources/userinfo", cfg.BaseAPI)
    req, err := http.NewRequest("GET", userinfourl, nil)
    if err != nil {
        log.Error(err)
-       return User{}, err
+       return nil, err
    }
 
    req.Header.Set("Authorization", authheader)
@@ -99,7 +106,7 @@ func getProfile(p *RespOAuthPayload) (User, error) {
    resp, err := client.Do(req)
    if err != nil {
        log.Error(err)
-       return User{}, err
+       return nil, err
    }
 
    defer resp.Body.Close()
@@ -107,13 +114,13 @@ func getProfile(p *RespOAuthPayload) (User, error) {
    body, err := ioutil.ReadAll(resp.Body)
    if err != nil {
        log.Error(err)
-       return User{}, err
+       return nil, err
    }
 
    var payload User
    json.Unmarshal(body, &payload)
 
-   return payload, nil
+   return &payload, nil
 }
 
 
@@ -134,10 +141,17 @@ func Callback(c echo.Context) error {
        return c.String(http.StatusInternalServerError, "Well rip it's not like faceit matters that much lol")
    }
 
-   user, err := getProfile(&authPayload)
+
+   user, err := getProfile(authPayload)
    if err != nil {
        return c.String(http.StatusInternalServerError, "Welp rip again :(")
    }
 
-   return c.JSON(http.StatusOK, user)
+   response := &Response{
+       TokenType: authPayload.TokenType,
+       Token:     authPayload.AccessToken,
+       User:      user,
+   }
+
+   return c.JSON(http.StatusOK, response)
 }
