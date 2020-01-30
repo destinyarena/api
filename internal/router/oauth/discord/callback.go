@@ -2,7 +2,7 @@ package discord
 
 import (
     "fmt"
-//    "bytes"
+    "errors"
     b64 "encoding/base64"
     "net/http"
     "io/ioutil"
@@ -32,6 +32,77 @@ type (
     }
 )
 
+func getUser(p *RespOAuthPayload) (User, error) {
+    client := new(http.Client)
+    authtoken := fmt.Sprintf("%s %s", p.TokenType, p.AccessToken)
+    log.Infoln(authtoken)
+
+    req, err := http.NewRequest("GET", fmt.Sprintf("%s/v6/users/@me", cfg.BaseURL), nil)
+    if err != nil {
+        return User{}, err
+    }
+
+    req.Header.Set("Authorization", authtoken)
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := client.Do(req)
+    if err != nil {
+        log.Error(err)
+        return User{}, err
+    }
+
+    defer resp.Body.Close()
+
+    userbody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        log.Error(err)
+        return User{}, err
+    }
+
+    var user User
+    json.Unmarshal(userbody, &user)
+
+    return user, nil
+}
+
+func getToken(p *ReqPayload) (RespOAuthPayload, error) {
+    client := new(http.Client)
+    OAuth2URL := fmt.Sprintf("%s/oauth2/token?grant_type=%s&code=%s&redirect_uri=%s&scope=%s", cfg.BaseURL, "authorization_code", p.Code, urlsafe(cfg.RedirectURI), cfg.Scope)
+
+    req, err := http.NewRequest("POST", OAuth2URL, nil)
+    if err != nil {
+        log.Error(err)
+        return RespOAuthPayload{}, err
+    }
+
+    creds := b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Discord))
+    req.Header.Set("Authorization", fmt.Sprintf("Basic %s", creds))
+    req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+    resp, err := client.Do(req)
+    if err != nil {
+        log.Error(err)
+        return RespOAuthPayload{}, err
+    }
+
+    defer resp.Body.Close()
+
+    authBody, err := ioutil.ReadAll(resp.Body)
+    if err != nil {
+        log.Error(err)
+        return RespOAuthPayload{}, err
+    }
+
+    if resp.StatusCode != 200 {
+        return RespOAuthPayload{}, errors.New("Invalid error code")
+    }
+
+    var authPayload RespOAuthPayload
+    json.Unmarshal(authBody, &authPayload)
+
+    return authPayload, nil
+}
+
 func Callback(c echo.Context) (err error) {
     payload := new(ReqPayload)
     if err = c.Bind(payload); err != nil {
@@ -43,67 +114,15 @@ func Callback(c echo.Context) (err error) {
         return c.String(http.StatusBadRequest, "Invalid Payload")
     }
 
-    client := new(http.Client)
-
-
-    OAuth2URL := fmt.Sprintf("%s/oauth2/token?grant_type=%s&code=%s&redirect_uri=%s&scope=%s", cfg.BaseURL, "authorization_code", payload.Code, urlsafe(cfg.RedirectURI), cfg.Scope)
-
-    req, err := http.NewRequest("POST", OAuth2URL, nil)
+    authPayload, err := getToken(payload)
     if err != nil {
-        return c.String(http.StatusInternalServerError, "Well shit we broken something lol")
+        return c.String(http.StatusInternalServerError, "Well rip discord")
     }
 
-    creds := b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Discord))
-    req.Header.Set("Authorization", fmt.Sprintf("Basic %s", creds))
-    req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-    resp, err := client.Do(req)
+    user, err := getUser(&authPayload)
     if err != nil {
-        log.Error(err)
-        return c.String(http.StatusInternalServerError, "Well shit something went wrong")
+        return c.String(http.StatusInternalServerError, "Fuck me")
     }
-
-    defer resp.Body.Close()
-
-    authBody, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        log.Error(err)
-        return c.String(http.StatusInternalServerError, "Looks like something went wrong with discord")
-    }
-
-    if resp.StatusCode != 200 {
-        return c.String(http.StatusBadRequest, "Error with discord's payload")
-    }
-
-    var authPayload RespOAuthPayload
-    json.Unmarshal(authBody, &authPayload)
-
-    authtoken := fmt.Sprintf("%s %s", authPayload.TokenType, authPayload.AccessToken)
-    log.Infoln(authtoken)
-
-    userreq, err := http.NewRequest("GET", fmt.Sprintf("%s/v6/users/@me", cfg.BaseURL), nil)
-    if err != nil {
-        return c.String(http.StatusInternalServerError, "Well shit we broken something lol")
-    }
-
-    userreq.Header.Set("Authorization", authtoken)
-    userreq.Header.Set("Content-Type", "application/json")
-    userresp, err := client.Do(userreq)
-    if err != nil {
-        log.Error(err)
-        return c.String(http.StatusInternalServerError, "Something went wrong please try again later")
-    }
-
-    defer userresp.Body.Close()
-
-    userbody, err := ioutil.ReadAll(userresp.Body)
-    if err != nil {
-        log.Error(err)
-        return c.String(http.StatusInternalServerError, "FUCK YOU")
-    }
-
-    var user User
-    json.Unmarshal(userbody, &user)
 
     return c.JSON(http.StatusOK, user)
 }
