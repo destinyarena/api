@@ -6,6 +6,7 @@ type (
         Username string `json:"username"`
         Password string `json:"password"`
         Host     string `json:"host"`
+        DBName   string `json:"name"`
     }
 
     Secrets struct {

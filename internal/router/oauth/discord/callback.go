@@ -38,7 +38,7 @@ type (
     }
 )
 
-func getUser(token string) (*User, error) {
+func GetUser(token string) (*User, error) {
     client := new(http.Client)
     authtoken := fmt.Sprintf("%s %s", "Bearer", token)
     log.Debugln(authtoken)
@@ -128,7 +128,7 @@ func Callback(c echo.Context) (err error) {
 
     accessToken := authPayload.AccessToken
 
-    user, err := getUser(accessToken)
+    user, err := GetUser(accessToken)
     if err != nil {
         return c.String(http.StatusInternalServerError, "Fuck me")
     }

@@ -1,17 +1,20 @@
 package registration
 
 import (
-    "github.com/surupsen/logrus"
+    "github.com/sirupsen/logrus"
     "github.com/labstack/echo/v4"
-    "github.com/arturoguerra/destinyarena-api/logging"
+    "github.com/arturoguerra/destinyarena-api/pkg/database"
+    "github.com/arturoguerra/destinyarena-api/internal/logging"
 )
 
-var log = logrus.Logger
+var log *logrus.Logger
+var dbclient *database.DBClient
 
-func int() {
+func init() {
     log = logging.New()
+}
 
-func New(e *echo.Echo) {
+func New(e *echo.Echo, client *database.DBClient) {
     log.Infoln("Registering POST /api/registration")
     e.POST("/api/registration", endpoint)
 }

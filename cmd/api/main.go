@@ -23,11 +23,11 @@ func main() {
 
     // Initial Database connection
     dbcfg := config.LoadSQLConfig()
-    db := database.New(dbcfg.Username, dbcfg.Password, dbcfg.Host)
-    db.Init()
+    dbclient := database.New(dbcfg.Username, dbcfg.Password, dbcfg.Host, dbcfg.DBName)
+    dbclient.Init()
 
     oauth.New(e)
-    registration.New(e)
+    registration.New(e, dbclient)
 
     host, port := config.LoadHTTPConfig()
     log.Infof("Running with HOST: %s PORT: %s", host, port)

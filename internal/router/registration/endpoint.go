@@ -1,7 +1,10 @@
 package registration
 
 import (
+    "errors"
+    "net/http"
     "github.com/labstack/echo/v4"
+    "gopkg.in/go-playground/validator.v9"
 )
 
 
@@ -20,71 +23,22 @@ type (
         Bungie    string `json:"bungie     validate:"required"`
         Recaptcha string `json:"recaptcha" validate:"required"`
     }
+
+    User struct {
+        Discord string
+        Bungie  string
+        Faceit  string
+    }
 )
 
-func recaptcha(code string) (err error) {
-    client := new(http.Client)
-    rurl := "https://www.google.com/recaptcha/api/siteverify"
-    body, err := json.Marshal(&RecaptchaPayload{
-        Secret: code,
-    })
-
-    if err != nil {
-        log.Error(err)
-        return err
-    }
-
-
-    payload := bytes.NewBuffer(body)
-
-    req, err := http.NewRequest("POST", rurl, payload)
-    if err != nil {
-        log.Error(err)
-        return err
-    }
-
-    req.Header.Set("Content-Type", "application/json")
-    resp, err := client.Do(req)
-    if err != nil {
-        log.Error(err)
-        return err
-    }
-
-    if resp.StatusCode != 200 {
-        err = errors.New("Returned Code: %d", resp.StatusCode)
-        log.Error(err)
-        return err
-    }
-
-    defer resp.Body.Close()
-
-    bodyresp, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        log.Error(err)
-        return err
-    }
-
-    var p ResponseRecaptcha
-    json.Unmarshal(bodyresp, &p)
-
-    if !p.Success {
-        err = errors.New("Looks like the token expired")
-        log.Error(err)
-        return err
-    }
-
-    return nil
-}
-
-
 func endpoint(c echo.Context) (err error) {
-    payload := new(payload)
+    payload := new(Payload)
     if err = c.Bind(payload); err != nil {
         log.Error(err)
         return c.String(http.StatusBadRequest, "Invalid payload")
     }
 
-    v := validate.New()
+    v := validator.New()
     if err = v.Struct(payload); err != nil {
         log.Error(err)
         return c.String(http.StatusBadRequest, "Error validating payload")
@@ -98,12 +52,16 @@ func endpoint(c echo.Context) (err error) {
     discord, bungie, faceit, err := getUsers(payload)
     if err != nil {
         log.Error(err)
-        return c.String(http.BadRequest, "Error fetching user profile from payload")
+        return c.String(http.StatusBadRequest, "Error fetching user profile from payload")
     }
 
-    user := newUser(discord, bungie, faceit)
+    user := &User{
+        Discord: discord,
+        Bungie:  bungie,
+        Faceit:  faceit,
+    }
 
-    if err, alt := insertUser(user)
+    err, alt := insertUser(user)
     if err != nil {
         log.Error(err)
         return c.String(http.StatusInternalServerError, "Well something went wrong while adding a new user")

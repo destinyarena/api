@@ -89,7 +89,7 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    return &payload, nil
 }
 
-func getProfile(token  string) (*User, error) {
+func GetProfile(token  string) (*User, error) {
    client := new(http.Client)
 
    authheader := fmt.Sprintf("%s %s", "Bearer", token)
@@ -143,7 +143,7 @@ func Callback(c echo.Context) error {
    token := authPayload.AccessToken
 
 
-   user, err := getProfile(token)
+   user, err := GetProfile(token)
    if err != nil {
        return c.String(http.StatusInternalServerError, "Welp rip again :(")
    }

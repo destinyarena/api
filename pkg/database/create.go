@@ -1,21 +1,35 @@
 package database
 
+/*
+This Check if a user is already in the database and adds them if they are not
+*/
+
 import (
     "errors"
 )
 
-func (f *DBClient) RegisterUser(NewUser *User) error {
-    err, db := f.Connect()
+func (f *DBClient) RegisterUser(discord, bungie, faceit string) (error, *User) {
+    db, err := f.Connect()
     if err != nil {
-        return err
+        return err, nil
     }
 
-    u := new(User)
-    db.Find(u, "discord <> ? OR faceit <> ? OR bungie <> ?", NewUser.Discord, NewUser.Faceit, NewUser.Bungie)
-    if u.ID != "" {
-        return errors.New("User already exists")
+    defer db.Close()
+
+    u := User{}
+    if db.Where("discord = ? OR faceit = ? OR bungie = ?", discord, faceit, bungie).First(&u).RecordNotFound() {
+        newUser := &User{
+            Discord: discord,
+            Bungie:  bungie,
+            Faceit:  faceit,
+        }
+
+        db.Create(newUser)
+
+        return nil, newUser
     }
 
-    db.Create(NewUser)
-    return nil
+    err = errors.New("Member already exists")
+
+    return err, &u
 }

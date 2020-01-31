@@ -7,19 +7,19 @@ import (
 
 type User struct {
     gorm.Model
-    ID      string `gorm:"type:uuid;primary_key"`
-    Discord string `gorm:"unique"`
-    Faceit  string `gorm:"unique"`
-    Bungie  string `gorm:"unique"`
-    Banned  bool   `gorm:"default:false"`
+    UUID    uuid.UUID `gorm:"primary_key"`
+    Discord string    `gorm:"unique"`
+    Faceit  string    `gorm:"unique"`
+    Bungie  string    `gorm:"unique"`
+    Banned  bool      `gorm:"default:false"`
 }
 
-func (User) TableName() string {
+func (u *User) TableName() string {
     return "profiles"
 }
 
-func (User) BeforeCreate(scope *gorm.Scope) error {
+func (u *User) BeforeCreate(scope *gorm.Scope) error {
     uuid := uuid.NewV4()
 
-    return scope.SetColumn("ID", uuid)
+    return scope.SetColumn("UUID", uuid)
 }

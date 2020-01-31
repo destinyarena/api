@@ -11,11 +11,13 @@ func LoadSQLConfig() *structs.SQL {
     username := os.Getenv("DB_USERNAME")
     password := os.Getenv("DB_PASSWORD")
     host := os.Getenv("DB_HOST")
+    dbname := os.Getenv("DB_NAME")
 
     return &structs.SQL{
         DBType:   dbtype,
         Username: username,
         Password: password,
         Host:     host,
+        DBName:   dbname,
     }
 }
