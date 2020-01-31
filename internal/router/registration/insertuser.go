@@ -9,14 +9,9 @@ import (
 )
 
 func insertUser(u *User) (err error, alt bool) {
-    err, user := dbclient.RegisterUser(u.Discord, u.Bungie, u.Faceit)
-    if err != nil && user == nil {
-        log.Error(err)
-        return err, false
-    }
-
-    if err != nil && user != nil {
-        log.Error(err)
+    log.Infoln(u)
+    err, _ = dbclient.RegisterUser(u.Discord, u.Bungie, u.Faceit)
+    if err != nil {
         return err, true
     }
 

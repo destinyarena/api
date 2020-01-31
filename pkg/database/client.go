@@ -35,6 +35,7 @@ func (c *DBClient) Init() error {
     }
 
     defer db.Close()
+    fmt.Println("Starting auto migrate")
 
     db.AutoMigrate(&User{})
 

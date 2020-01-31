@@ -17,4 +17,6 @@ func init() {
 func New(e *echo.Echo, client *database.DBClient) {
     log.Infoln("Registering POST /api/registration")
     e.POST("/api/registration", endpoint)
+
+    dbclient = client
 }

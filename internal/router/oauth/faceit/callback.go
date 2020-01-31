@@ -47,7 +47,7 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    client := new(http.Client)
 
    authheader := fmt.Sprintf("Basic %s", b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Faceit)))
-   authurl := fmt.Sprintf("%s/auth/v1/oauth/token?grant_type=authorization_code&code=%s", cfg.BaseAPI ,p.Code)
+   authurl := fmt.Sprintf("%s/auth/v1/oauth/token?grant_type=authorization_code&code=%s", cfg.BaseAPI, p.Code)
 
 
    req, err := http.NewRequest("POST", authurl, nil)
@@ -69,7 +69,7 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    }
 
    if resp.StatusCode != 200 {
-       err = errors.New("Server didn't Respond with a 200")
+       err = errors.New(fmt.Sprintf("Server didn't Respond with a 200"))
        log.Error(err)
        return nil, err
    }
@@ -92,7 +92,7 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
 func GetProfile(token  string) (*User, error) {
    client := new(http.Client)
 
-   authheader := fmt.Sprintf("%s %s", "Bearer", token)
+   authheader := fmt.Sprintf("Bearer %s", token)
    userinfourl := fmt.Sprintf("%s/auth/v1/resources/userinfo", cfg.BaseAPI)
    req, err := http.NewRequest("GET", userinfourl, nil)
    if err != nil {
@@ -113,6 +113,12 @@ func GetProfile(token  string) (*User, error) {
    body, err := ioutil.ReadAll(resp.Body)
    if err != nil {
        log.Error(err)
+       return nil, err
+   }
+
+   if resp.StatusCode != 200 {
+       log.Error(string(body))
+       err := errors.New(fmt.Sprintf("Server responded with error code: %d", resp.StatusCode))
        return nil, err
    }
 

@@ -20,7 +20,7 @@ type (
     Payload struct {
         Discord   string `json:"discord"   validate:"required"`
         Faceit    string `json:"faceit"    validate:"required"`
-        Bungie    string `json:"bungie     validate:"required"`
+        Bungie    string `json:"bungie"    validate:"required"`
         Recaptcha string `json:"recaptcha" validate:"required"`
     }
 

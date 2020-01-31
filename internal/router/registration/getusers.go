@@ -19,6 +19,7 @@ func getUsers(p *Payload) (discord, faceit, bungie string, err  error) {
         return "", "", "", err
     }
 
+
     rawBungie, err := bungieAuth.GetUser(p.Bungie)
     if err != nil {
         log.Error(err)
