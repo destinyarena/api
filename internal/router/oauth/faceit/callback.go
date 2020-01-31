@@ -33,7 +33,6 @@ type (
     }
 
     Response struct {
-        TokenType string `json:"token_type"`
         Token     string `json:"token"`
         User      *User  `json:"user"`
     }
@@ -90,10 +89,10 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    return &payload, nil
 }
 
-func getProfile(token, tokenType string) (*User, error) {
+func getProfile(token  string) (*User, error) {
    client := new(http.Client)
 
-   authheader := fmt.Sprintf("%s %s", tokenType, token)
+   authheader := fmt.Sprintf("%s %s", "Bearer", token)
    userinfourl := fmt.Sprintf("%s/auth/v1/resources/userinfo", cfg.BaseAPI)
    req, err := http.NewRequest("GET", userinfourl, nil)
    if err != nil {
@@ -142,16 +141,14 @@ func Callback(c echo.Context) error {
    }
 
    token := authPayload.AccessToken
-   tokenType := authPayload.TokenType
 
 
-   user, err := getProfile(token, tokenType)
+   user, err := getProfile(token)
    if err != nil {
        return c.String(http.StatusInternalServerError, "Welp rip again :(")
    }
 
    response := &Response{
-       TokenType: tokenType,
        Token:     token,
        User:      user,
    }

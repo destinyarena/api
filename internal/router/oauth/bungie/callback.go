@@ -57,7 +57,6 @@ type (
 
     Response struct {
         Token     string `json:"token"`
-        TokenType string `json:"token_type"`
         User      *User  `json:"user"`
     }
 )
@@ -112,9 +111,9 @@ func getToken(p *RespPayload) (*RespToken, error) {
     return &payload, nil
 }
 
-func GetUser(token, tokenType string) (*User, error) {
+func GetUser(token  string) (*User, error) {
     client := new(http.Client)
-    authHeader := fmt.Sprintf("%s %s", tokenType, token)
+    authHeader := fmt.Sprintf("%s %s", "Bearer", token)
     url := fmt.Sprintf("%s/User/GetMembershipsForCurrentUser", cfg.BaseAPI)
 
     req, err := http.NewRequest("GET", url, nil)
@@ -176,16 +175,14 @@ func Callback(c echo.Context) (err error) {
     }
 
     accessToken := authPayload.AccessToken
-    tokenType   := authPayload.TokenType
 
-    user, err := GetUser(accessToken, tokenType)
+    user, err := GetUser(accessToken)
     if err != nil {
         return c.String(http.StatusInternalServerError, "Fuck me plz")
     }
 
     response := &Response{
         Token:     accessToken,
-        TokenType: tokenType,
         User:      user,
     }
 

@@ -21,6 +21,8 @@ func init() {
 }
 
 func New(g *echo.Group) {
+    log.Infoln("Registering GET /api/oauth/bungie/authurl")
     g.GET("/bungie/authurl", GetOAuthURL)
+    log.Infoln("Registering GET /api/oauth/bungie/callback")
     g.GET("/bungie/callback", Callback)
 }

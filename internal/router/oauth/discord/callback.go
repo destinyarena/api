@@ -29,7 +29,6 @@ type (
     Response struct {
         User      *User  `json:"user"`
         Token     string `json:"token"`
-        TokenType string `json:"token_type"`
     }
 
     User struct {
@@ -39,9 +38,9 @@ type (
     }
 )
 
-func getUser(token, tokenType string) (*User, error) {
+func getUser(token string) (*User, error) {
     client := new(http.Client)
-    authtoken := fmt.Sprintf("%s %s", tokenType, token)
+    authtoken := fmt.Sprintf("%s %s", "Bearer", token)
     log.Debugln(authtoken)
 
     req, err := http.NewRequest("GET", fmt.Sprintf("%s/v6/users/@me", cfg.BaseURL), nil)
@@ -128,16 +127,14 @@ func Callback(c echo.Context) (err error) {
     }
 
     accessToken := authPayload.AccessToken
-    tokenType := authPayload.TokenType
 
-    user, err := getUser(accessToken, tokenType)
+    user, err := getUser(accessToken)
     if err != nil {
         return c.String(http.StatusInternalServerError, "Fuck me")
     }
 
     response := &Response{
         Token:     accessToken,
-        TokenType: tokenType,
         User:      user,
     }
 

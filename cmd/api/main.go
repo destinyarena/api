@@ -6,6 +6,7 @@ import (
     "github.com/labstack/echo/v4/middleware"
     "github.com/arturoguerra/destinyarena-api/internal/config"
     "github.com/arturoguerra/destinyarena-api/internal/router/oauth"
+    "github.com/arturoguerra/destinyarena-api/internal/router/registration"
     "github.com/arturoguerra/destinyarena-api/pkg/database"
     "github.com/arturoguerra/destinyarena-api/internal/logging"
 )
@@ -26,6 +27,7 @@ func main() {
     db.Init()
 
     oauth.New(e)
+    registration.New(e)
 
     host, port := config.LoadHTTPConfig()
     log.Infof("Running with HOST: %s PORT: %s", host, port)
