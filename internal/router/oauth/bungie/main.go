@@ -22,4 +22,5 @@ func init() {
 
 func New(g *echo.Group) {
     g.GET("/bungie/authurl", GetOAuthURL)
+    g.GET("/bungie/callback", Callback)
 }

@@ -2,17 +2,18 @@ package structs
 
 type (
     SQL struct {
-        DBType  string `json:"dbtype"`
+        DBType   string `json:"dbtype"`
         Username string `json:"username"`
         Password string `json:"password"`
         Host     string `json:"host"`
     }
 
     Secrets struct {
-        Discord   string `json:"discord"`
-        Faceit    string `json:"faceit"`
-        Bungie    string `json:"bungie"`
-        JWTSecret string `json:"jwtsecret"`
-        APIKey    string `json:"apikey"`
+        Discord      string `json:"discord"`
+        Faceit       string `json:"faceit"`
+        Bungie       string `json:"bungie"`
+        BungieAPIKey string `json:"bungie_api_key"`
+        JWTSecret    string `json:"jwt_secret"`
+        APIKey       string `json:"api_key"`
     }
 )

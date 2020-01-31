@@ -48,7 +48,7 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    client := new(http.Client)
 
    authheader := fmt.Sprintf("Basic %s", b64.StdEncoding.EncodeToString([]byte(cfg.ClientID + ":" + secrets.Faceit)))
-   authurl := fmt.Sprintf("%s/auth/v1/oauth/token?grant_type=authorization_code&code=%s",cfg.BaseAPI ,p.Code)
+   authurl := fmt.Sprintf("%s/auth/v1/oauth/token?grant_type=authorization_code&code=%s", cfg.BaseAPI ,p.Code)
 
 
    req, err := http.NewRequest("POST", authurl, nil)
@@ -90,10 +90,10 @@ func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
    return &payload, nil
 }
 
-func getProfile(p *RespOAuthPayload) (*User, error) {
+func getProfile(token, tokenType string) (*User, error) {
    client := new(http.Client)
 
-   authheader := fmt.Sprintf("Bearer %s", p.AccessToken)
+   authheader := fmt.Sprintf("%s %s", tokenType, token)
    userinfourl := fmt.Sprintf("%s/auth/v1/resources/userinfo", cfg.BaseAPI)
    req, err := http.NewRequest("GET", userinfourl, nil)
    if err != nil {
@@ -141,15 +141,18 @@ func Callback(c echo.Context) error {
        return c.String(http.StatusInternalServerError, "Well rip it's not like faceit matters that much lol")
    }
 
+   token := authPayload.AccessToken
+   tokenType := authPayload.TokenType
 
-   user, err := getProfile(authPayload)
+
+   user, err := getProfile(token, tokenType)
    if err != nil {
        return c.String(http.StatusInternalServerError, "Welp rip again :(")
    }
 
    response := &Response{
-       TokenType: authPayload.TokenType,
-       Token:     authPayload.AccessToken,
+       TokenType: tokenType,
+       Token:     token,
        User:      user,
    }
 

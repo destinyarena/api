@@ -9,6 +9,7 @@ import (
     "encoding/json"
     "github.com/labstack/echo/v4"
     "gopkg.in/go-playground/validator.v9"
+    "github.com/arturoguerra/destinyarena-api/internal/utils"
 )
 
 
@@ -38,10 +39,10 @@ type (
     }
 )
 
-func getUser(p *RespOAuthPayload) (*User, error) {
+func getUser(token, tokenType string) (*User, error) {
     client := new(http.Client)
-    authtoken := fmt.Sprintf("%s %s", p.TokenType, p.AccessToken)
-    log.Infoln(authtoken)
+    authtoken := fmt.Sprintf("%s %s", tokenType, token)
+    log.Debugln(authtoken)
 
     req, err := http.NewRequest("GET", fmt.Sprintf("%s/v6/users/@me", cfg.BaseURL), nil)
     if err != nil {
@@ -59,14 +60,14 @@ func getUser(p *RespOAuthPayload) (*User, error) {
 
     defer resp.Body.Close()
 
-    userbody, err := ioutil.ReadAll(resp.Body)
+    body, err := ioutil.ReadAll(resp.Body)
     if err != nil {
         log.Error(err)
         return nil, err
     }
 
     var user User
-    json.Unmarshal(userbody, &user)
+    json.Unmarshal(body, &user)
 
 
     return &user, nil
@@ -74,9 +75,9 @@ func getUser(p *RespOAuthPayload) (*User, error) {
 
 func getToken(p *ReqPayload) (*RespOAuthPayload, error) {
     client := new(http.Client)
-    OAuth2URL := fmt.Sprintf("%s/oauth2/token?grant_type=%s&code=%s&redirect_uri=%s&scope=%s", cfg.BaseURL, "authorization_code", p.Code, urlsafe(cfg.RedirectURI), cfg.Scope)
+    url := fmt.Sprintf("%s/oauth2/token?grant_type=%s&code=%s&redirect_uri=%s&scope=%s", cfg.BaseURL, "authorization_code", p.Code, utils.SafeUrl(cfg.RedirectURI), cfg.Scope)
 
-    req, err := http.NewRequest("POST", OAuth2URL, nil)
+    req, err := http.NewRequest("POST", url, nil)
     if err != nil {
         log.Error(err)
         return nil, err
@@ -126,14 +127,17 @@ func Callback(c echo.Context) (err error) {
         return c.String(http.StatusInternalServerError, "Well rip discord")
     }
 
-    user, err := getUser(authPayload)
+    accessToken := authPayload.AccessToken
+    tokenType := authPayload.TokenType
+
+    user, err := getUser(accessToken, tokenType)
     if err != nil {
         return c.String(http.StatusInternalServerError, "Fuck me")
     }
 
     response := &Response{
-        Token:     authPayload.AccessToken,
-        TokenType: authPayload.TokenType,
+        Token:     accessToken,
+        TokenType: tokenType,
         User:      user,
     }
 
