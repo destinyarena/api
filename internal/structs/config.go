@@ -12,6 +12,7 @@ type (
     Secrets struct {
         Discord      string `json:"discord"`
         Faceit       string `json:"faceit"`
+        FaceitAPIKey string `json:"faceit_api_key"`
         Bungie       string `json:"bungie"`
         BungieAPIKey string `json:"bungie_api_key"`
         JWTSecret    string `json:"jwt_secret"`

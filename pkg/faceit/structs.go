@@ -4,7 +4,7 @@ type (
     FaceitUser struct {
         Id         string `json:"id"`
         Username   string `json:"username"`
-        SkillLevel string `json:"skilllevel"`
+        SkillLevel int    `json:"skilllevel"`
         Steam      string `json:"steam"`
     }
 
@@ -16,5 +16,6 @@ type (
         Id       string `json:"player_id" validate:"required"`
         Username string `json:"nickname" validate:"required"`
         SteamID  string `json:"steam_id_64" validate:"required"`
+        Games    map[string]Game `json:"games" validate:"required"`
     }
 )

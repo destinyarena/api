@@ -3,6 +3,7 @@ package faceit
 import (
     "fmt"
     "net/http"
+)
 
 var client *http.Client
 
@@ -12,19 +13,21 @@ type AddHeaderTransport struct {
 }
 
 func (adt *AddHeaderTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-   req.Header.Add("User-Agent", "go")
    req.Header.Add("Content-Type", "application/json")
-   req.Header.Add("Authorixation", fmt.Sprinf("Bearer %s", adt.Token)
+   req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", adt.Token))
    return adt.T.RoundTrip(req)
 }
 
 func NewClient(token string) *http.Client {
     t := http.DefaultTransport
-    return &http.Client{Transport: &AddHeaderTransport{t}}
+    return &http.Client{Transport: &AddHeaderTransport{
+        Token: token,
+        T: t,
+    }}
 }
 
 
-type Faceit {
+type Faceit struct {
     UC *http.Client
 }
 

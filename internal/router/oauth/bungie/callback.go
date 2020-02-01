@@ -52,10 +52,12 @@ type (
     }
 
     User struct {
-        ID               string `json:"membershipId" validate:"required"`
-        DisplayName      string `json:"displayName" validate:"required"`
-        SteamDisplayName string `json:"steamDisplayname,omitempty"`
-        // TODO: PSN Display Name, need someone how has a PSN account
+        ID                  string `json:"membershipId" validate:"required"`
+        DisplayName         string `json:"displayName" validate:"required"`
+        SteamDisplayName    string `json:"steamDisplayName,omitempty"`
+        XboxDisplayName     string `json:"xboxDisplayName,omitempty"`
+        PSNDisplayName      string `json:"psnDisplayName,omitempty"`
+        blizzardDisplayName string `json:"blizzardDisplayName,omitempty"`
     }
 
     Claims struct {

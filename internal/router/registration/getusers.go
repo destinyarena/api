@@ -48,5 +48,5 @@ func getUsers(p *Payload) (string, string, string, error) {
     }
 
 
-    return discordClaims.ID, faceitClaims.GUID, bungieClaims.ID, nil
+    return discordClaims.ID, bungieClaims.ID, faceitClaims.GUID, nil
 }

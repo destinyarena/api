@@ -7,6 +7,7 @@ import (
     "github.com/arturoguerra/destinyarena-api/internal/config"
     "github.com/arturoguerra/destinyarena-api/internal/router/oauth"
     "github.com/arturoguerra/destinyarena-api/internal/router/registration"
+    "github.com/arturoguerra/destinyarena-api/internal/router/users"
     "github.com/arturoguerra/destinyarena-api/pkg/database"
     "github.com/arturoguerra/destinyarena-api/internal/logging"
 )
@@ -28,6 +29,7 @@ func main() {
 
     oauth.New(e)
     registration.New(e, dbclient)
+    users.New(e, dbclient)
 
     host, port := config.LoadHTTPConfig()
     log.Infof("Running with HOST: %s PORT: %s", host, port)
