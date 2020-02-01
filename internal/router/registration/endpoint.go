@@ -52,7 +52,7 @@ func endpoint(c echo.Context) (err error) {
     discord, bungie, faceit, err := getUsers(payload)
     if err != nil {
         log.Error(err)
-        return c.String(http.StatusBadRequest, "Error fetching user profile from payload")
+        return c.String(403, "Error fetching user profile from payload")
     }
 
     user := &User{
@@ -61,16 +61,18 @@ func endpoint(c echo.Context) (err error) {
         Faceit:  faceit,
     }
 
-    err, alt := insertUser(user)
-    if err != nil {
-        log.Error(err)
-        return c.String(http.StatusInternalServerError, "Well something went wrong while adding a new user")
-    }
+    log.Debugln(user)
 
+    err, alt := insertUser(user)
     if alt {
         err = errors.New("Sorry but one or more account's are already registered")
         log.Error(err)
         return c.String(401, "Sorry but one or more accounts's are already registered")
+    }
+
+    if err != nil {
+        log.Error(err)
+        return c.String(http.StatusInternalServerError, "Well something went wrong while adding a new user")
     }
 
     return c.String(http.StatusOK, "You have successfully registered")

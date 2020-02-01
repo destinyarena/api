@@ -3,6 +3,7 @@ package bungie
 
 import (
     "fmt"
+    "time"
     "errors"
     "net/http"
     "net/url"
@@ -11,8 +12,10 @@ import (
     "strconv"
     "encoding/json"
     b64 "encoding/base64"
+    "github.com/dgrijalva/jwt-go"
     "github.com/labstack/echo/v4"
     "gopkg.in/go-playground/validator.v9"
+    "github.com/arturoguerra/destinyarena-api/internal/utils"
 )
 
 type (
@@ -51,14 +54,15 @@ type (
     User struct {
         ID               string `json:"membershipId" validate:"required"`
         DisplayName      string `json:"displayName" validate:"required"`
-        SteamDisplayName string `json:"steamDisplayname"`
+        SteamDisplayName string `json:"steamDisplayname,omitempty"`
         // TODO: PSN Display Name, need someone how has a PSN account
     }
 
-    Response struct {
-        Token     string `json:"token"`
-        User      *User  `json:"user"`
+    Claims struct {
+        *User
+        jwt.StandardClaims
     }
+
 )
 
 func getToken(p *RespPayload) (*RespToken, error) {
@@ -181,10 +185,23 @@ func Callback(c echo.Context) (err error) {
         return c.String(http.StatusInternalServerError, "Fuck me plz")
     }
 
-    response := &Response{
-        Token:     accessToken,
-        User:      user,
+    claims := &Claims{
+        User: user,
+        StandardClaims: jwt.StandardClaims{
+            ExpiresAt: time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+            IssuedAt: time.Now().Unix(),
+        },
     }
 
-    return c.JSON(http.StatusOK, response)
+    token, err := utils.SignJWT(claims)
+    if err != nil {
+        log.Error(err)
+        return c.String(http.StatusInternalServerError, "Error when creating Token")
+    }
+
+    r := map[string]interface{}{
+        "token": token,
+    }
+
+    return c.JSON(http.StatusOK, r)
 }

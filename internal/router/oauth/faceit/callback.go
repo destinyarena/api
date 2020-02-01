@@ -3,13 +3,16 @@ package faceit
 import (
     "fmt"
     //"bytes"
+    "time"
     "errors"
     "net/http"
     "io/ioutil"
     "encoding/json"
     b64 "encoding/base64"
+    "github.com/dgrijalva/jwt-go"
     "github.com/labstack/echo/v4"
     "gopkg.in/go-playground/validator.v9"
+    "github.com/arturoguerra/destinyarena-api/internal/utils"
 )
 
 type (
@@ -32,14 +35,14 @@ type (
         Scope        string `json:"scope"`
     }
 
-    Response struct {
-        Token     string `json:"token"`
-        User      *User  `json:"user"`
+    User struct {
+        GUID     string `json:"guid"`
+        Nickname string `json:"nickname"`
     }
 
-    User struct {
-        PlayerID string `json:"guid"`
-        Nickname string `json:"nickname"`
+    Claims struct {
+        *User
+        jwt.StandardClaims
     }
 )
 
@@ -146,18 +149,31 @@ func Callback(c echo.Context) error {
        return c.String(http.StatusInternalServerError, "Well rip it's not like faceit matters that much lol")
    }
 
-   token := authPayload.AccessToken
+   accessToken := authPayload.AccessToken
 
 
-   user, err := GetProfile(token)
+   user, err := GetProfile(accessToken)
    if err != nil {
        return c.String(http.StatusInternalServerError, "Welp rip again :(")
    }
 
-   response := &Response{
-       Token:     token,
-       User:      user,
+    claims := &Claims{
+        User: user,
+        StandardClaims: jwt.StandardClaims{
+            ExpiresAt:  time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+            IssuedAt: time.Now().Unix(),
+        },
+    }
+
+   token, err := utils.SignJWT(claims)
+   if err != nil {
+       log.Error(err)
+       return c.String(http.StatusInternalServerError, "Error while creating Token")
    }
 
-   return c.JSON(http.StatusOK, response)
+   r := map[string]interface{}{
+       "token": token,
+   }
+
+   return c.JSON(http.StatusOK, r)
 }

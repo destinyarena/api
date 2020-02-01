@@ -2,11 +2,13 @@ package discord
 
 import (
     "fmt"
+    "time"
     "errors"
     b64 "encoding/base64"
     "net/http"
     "io/ioutil"
     "encoding/json"
+    "github.com/dgrijalva/jwt-go"
     "github.com/labstack/echo/v4"
     "gopkg.in/go-playground/validator.v9"
     "github.com/arturoguerra/destinyarena-api/internal/utils"
@@ -26,15 +28,15 @@ type (
         Scope        string `json:"scope"`
     }
 
-    Response struct {
-        User      *User  `json:"user"`
-        Token     string `json:"token"`
-    }
-
     User struct {
         ID            string `json:"id"`
         Username      string `json:"username"`
         Discriminator string `json:"discriminator"`
+    }
+
+    Claims struct {
+        User
+        jwt.StandardClaims
     }
 )
 
@@ -123,20 +125,33 @@ func Callback(c echo.Context) (err error) {
 
     authPayload, err := getToken(payload)
     if err != nil {
-        return c.String(http.StatusInternalServerError, "Well rip discord")
+        return c.String(401, "Error while getting Auth token from bungie")
     }
 
     accessToken := authPayload.AccessToken
 
     user, err := GetUser(accessToken)
     if err != nil {
-        return c.String(http.StatusInternalServerError, "Fuck me")
+        return c.String(http.StatusInternalServerError, "Bungie API is probably down again")
     }
 
-    response := &Response{
-        Token:     accessToken,
-        User:      user,
+    claims := &Claims{
+        User: *user,
+        StandardClaims: jwt.StandardClaims{
+            ExpiresAt: time.Now().Add(time.Hour * time.Duration(1)).Unix(),
+            IssuedAt: time.Now().Unix(),
+        },
     }
 
-    return c.JSON(http.StatusOK, response)
+
+    token, err := utils.SignJWT(claims)
+    if err != nil {
+        return c.String(http.StatusInternalServerError, "Something went wrong while generation Token")
+    }
+
+    r := map[string]interface{}{
+        "token": token,
+    }
+
+    return c.JSON(http.StatusOK, r)
 }
