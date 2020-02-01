@@ -12,6 +12,7 @@ type (
         Bungie    string `json:"bungie"    validate:"required"`
         Faceit    string `json:"faceit"    validate:"required"`
         FaceitLvl int    `json:"faceitlvl" validate:"required"`
+        Banned    bool   `json:"banned"    validate:"required"`
     }
 )
 
@@ -43,8 +44,8 @@ func getUser(c echo.Context) error {
         Discord: dbuser.Discord,
         Bungie: dbuser.Bungie,
         Faceit: dbuser.Faceit,
-        Banned: dbuser.Banned,
         FaceitLvl: lvl,
+        Banned: dbuser.Banned,
     }
 
     return c.JSON(http.StatusOK, user)
