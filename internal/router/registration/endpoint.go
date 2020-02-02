@@ -52,7 +52,7 @@ func endpoint(c echo.Context) (err error) {
     discord, bungie, faceit, err := getUsers(payload)
     if err != nil {
         log.Error(err)
-        return c.String(403, "Error fetching user profile from payload")
+        return c.String(http.StatusUnauthorized, "Error fetching user profile from payload")
     }
 
     user := &User{
@@ -67,7 +67,7 @@ func endpoint(c echo.Context) (err error) {
     if alt {
         err = errors.New("Sorry but one or more account's are already registered")
         log.Error(err)
-        return c.String(401, "Sorry but one or more accounts's are already registered")
+        return c.String(http.StatusForbidden, "Sorry but one or more accounts's are already registered")
     }
 
     if err != nil {

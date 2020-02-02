@@ -2,6 +2,7 @@ package main
 
 import (
     "fmt"
+    "net/http"
     "github.com/labstack/echo/v4"
     "github.com/labstack/echo/v4/middleware"
     "github.com/arturoguerra/destinyarena-api/internal/config"
@@ -30,6 +31,10 @@ func main() {
     oauth.New(e)
     registration.New(e, dbclient)
     users.New(e, dbclient)
+
+    e.GET("/", func(c echo.Context) error {
+        return c.String(http.StatusOK, "Hello")
+    })
 
     host, port := config.LoadHTTPConfig()
     log.Infof("Running with HOST: %s PORT: %s", host, port)
