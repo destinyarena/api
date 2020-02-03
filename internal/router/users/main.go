@@ -12,10 +12,10 @@ var log = logging.New()
 var dbclient *database.DBClient
 var secrets = config.LoadSecrets()
 
-func New(e *echo.Echo, client *database.DBClient) {
+func New(e *echo.Group, client *database.DBClient) {
     dbclient = client
 
-    g := e.Group("/api/users", middleware.BotAuth)
+    g := e.Group("/users", middleware.BotAuth)
 
     g.GET("/get/:id", getUser)
 }

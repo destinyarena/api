@@ -23,7 +23,7 @@ func main() {
     e := echo.New()
 
     // Logs HTTP Requests
-    e.Use(middleware.Logger())
+    //e.Use(middleware.Logger())
     // Recover Application from a panic anywhere in the chain
     e.Use(middleware.Recover())
 
@@ -33,10 +33,12 @@ func main() {
     dbclient := database.New(dbcfg.Username, secrets.DBPassword, dbcfg.Host, dbcfg.DBName)
     dbclient.Init()
 
-    oauth.New(e)
-    registration.New(e, dbclient)
-    users.New(e, dbclient)
-    invites.New(e)
+    g := e.Group("/api", middleware.Logger())
+
+    oauth.New(g)
+    registration.New(g, dbclient)
+    users.New(g, dbclient)
+    invites.New(g)
 
     e.GET("/", func(c echo.Context) error {
         return c.String(http.StatusOK, "destinyarena api base")

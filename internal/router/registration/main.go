@@ -14,9 +14,9 @@ func init() {
     log = logging.New()
 }
 
-func New(e *echo.Echo, client *database.DBClient) {
+func New(e *echo.Group, client *database.DBClient) {
     log.Infoln("Registering POST /api/registration")
-    e.POST("/api/registration", endpoint)
+    e.POST("/registration", endpoint)
 
     dbclient = client
 }

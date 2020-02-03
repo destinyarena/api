@@ -14,7 +14,7 @@ import (
 var secrets = config.LoadSecrets()
 var log = logging.New()
 
-func New(e *echo.Echo) {
-    g := e.Group("/api/invites", middleware.BotAuth)
+func New(e *echo.Group) {
+    g := e.Group("/invites", middleware.BotAuth)
     g.GET("/:id", getInvite)
 }

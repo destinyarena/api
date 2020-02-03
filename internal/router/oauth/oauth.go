@@ -8,11 +8,11 @@ import (
     "github.com/labstack/echo/v4"
 )
 
-func New(e *echo.Echo) {
+func New(e *echo.Group) {
     logger := logging.New()
     logger.Info("Registring Group /api/oauth")
 
-    g := e.Group("/api/oauth")
+    g := e.Group("/oauth")
     discord.New(g)
     faceit.New(g)
     bungie.New(g)

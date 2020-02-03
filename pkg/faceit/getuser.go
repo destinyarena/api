@@ -34,16 +34,17 @@ func (f *Faceit) GetUser(guid string) (*FaceitUser, error) {
         return nil, err
     }
 
-    if _, ok := body.Games["destiny2"]; ok {
-        user := &FaceitUser{
-            Id:         body.Id,
-            Username:   body.Username,
-            SkillLevel: body.Games["destiny2"].SkillLevel,
-            Steam:      body.SteamID,
-        }
+    skillLevel := 1
 
-        return user, nil
+    if _, ok := body.Games["destiny2"]; ok {
+        skillLevel = body.Games["destiny2"].SkillLevel
     }
 
-    return nil, errors.New("User doesn't have destiny 2 linked")
+    user := &FaceitUser{
+        Id:         body.Id,
+        Username:   body.Username,
+        SkillLevel: skillLevel,
+    }
+
+    return user, nil
 }
