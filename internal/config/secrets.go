@@ -7,21 +7,25 @@ import (
 
 func LoadSecrets() *structs.Secrets {
     log.Infoln("Loading Secrets")
-    discord      := os.Getenv("SECRET_DISCORD")
-    faceit       := os.Getenv("SECRET_FACEIT")
-    faceitapikey := os.Getenv("SECRET_FACEIT_API_KEY")
-    bungie       := os.Getenv("SECRET_BUNGIE")
-    bungieapikey := os.Getenv("SECRET_BUNGIE_API_KEY")
-    jwt          := os.Getenv("SECRET_JWT")
-    apikey       := os.Getenv("SECRET_API_KEY")
+    discord       := os.Getenv("SECRET_DISCORD")
+    faceit        := os.Getenv("SECRET_FACEIT")
+    faceitapikey  := os.Getenv("SECRET_FACEIT_API_KEY")
+    faceituserkey := os.Getenv("SECRET_FACEIT_USER_KEY")
+    bungie        := os.Getenv("SECRET_BUNGIE")
+    bungieapikey  := os.Getenv("SECRET_BUNGIE_API_KEY")
+    jwt           := os.Getenv("SECRET_JWT")
+    apikey        := os.Getenv("SECRET_API_KEY")
+    dbpassword    := os.Getenv("SECRET_DB_PASSWORD")
 
     return &structs.Secrets{
-        Discord:      discord,
-        Faceit:       faceit,
-        FaceitAPIKey: faceitapikey,
-        Bungie:       bungie,
-        BungieAPIKey: bungieapikey,
-        JWTSecret:    jwt,
-        APIKey:       apikey,
+        Discord:       discord,
+        Faceit:        faceit,
+        FaceitAPIKey:  faceitapikey,
+        FaceitUserKey: faceituserkey,
+        Bungie:        bungie,
+        BungieAPIKey:  bungieapikey,
+        JWTSecret:     jwt,
+        APIKey:        apikey,
+        DBPassword:    dbpassword,
     }
 }

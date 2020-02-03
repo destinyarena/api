@@ -1,6 +1,7 @@
 package faceit
 
 type (
+    // GetUser
     FaceitUser struct {
         Id         string `json:"id"`
         Username   string `json:"username"`
@@ -17,5 +18,23 @@ type (
         Username string `json:"nickname" validate:"required"`
         SteamID  string `json:"steam_id_64" validate:"required"`
         Games    map[string]Game `json:"games" validate:"required"`
+    }
+
+
+    //GetInvite
+    ReqInvitePayload struct {
+        EntityID   string `json:"entity_id"`
+        EntityType string `json:"entity_type"`
+        Type       string `json:"type"`
+        MaxAge     int    `json:"max_age"`
+        MaxUsers   int    `json:"max_users"`
+    }
+
+    Invite struct {
+        Payload InvitePayload `json:"payload"`
+    }
+
+    InvitePayload struct {
+        Code string `json:"code"`
     }
 )

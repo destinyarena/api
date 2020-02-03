@@ -13,7 +13,7 @@ func (f *Faceit) GetUser(guid string) (*FaceitUser, error) {
     url := fmt.Sprintf("https://open.faceit.com/data/v4/players/%s", guid)
 
     req, _ := http.NewRequest("GET", url, nil)
-    resp, err := f.UC.Do(req)
+    resp, err := f.SC.Do(req)
     if err != nil {
         return nil, err
     }

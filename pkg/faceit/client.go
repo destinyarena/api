@@ -29,9 +29,14 @@ func NewClient(token string) *http.Client {
 
 type Faceit struct {
     UC *http.Client
+    SC *http.Client
 }
 
 func New(token string) *Faceit {
     UC := NewClient(token)
-    return &Faceit{UC}
+    SC := NewClient(token)
+    return &Faceit{
+        UC: UC,
+        SC: SC,
+    }
 }
