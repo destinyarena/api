@@ -1,22 +1,25 @@
 package registration
 
 import (
-    "github.com/sirupsen/logrus"
     "github.com/labstack/echo/v4"
-    "github.com/arturoguerra/destinyarena-api/pkg/database"
+    "github.com/arturoguerra/destinyarena-api/internal/config"
     "github.com/arturoguerra/destinyarena-api/internal/logging"
+    pb "github.com/arturoguerra/destinyarena-api/pkg/profiles"
 )
 
-var log *logrus.Logger
-var dbclient *database.DBClient
-
-func init() {
+var (
     log = logging.New()
-}
+    uClient pb.ProfilesClient
+)
 
-func New(e *echo.Group, client *database.DBClient) {
+func New(e *echo.Group) {
     log.Infoln("Registering POST /api/registration")
     e.POST("/registration", endpoint)
 
-    dbclient = client
+    grpcfg := config.LoadGRPConfig()
+    uClient, err := pb.New(grpcfg.ProfilesHost, grpcfg.ProfilesPort)
+    if err != nil {
+        log.Error(err)
+    }
+    var _ = uClient
 }

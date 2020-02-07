@@ -6,7 +6,6 @@ import (
 )
 
 func LoadSecrets() *structs.Secrets {
-    log.Infoln("Loading Secrets")
     discord       := os.Getenv("SECRET_DISCORD")
     faceit        := os.Getenv("SECRET_FACEIT")
     faceitapikey  := os.Getenv("SECRET_FACEIT_API_KEY")

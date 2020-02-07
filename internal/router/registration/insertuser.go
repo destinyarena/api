@@ -10,6 +10,8 @@ TODO: Fix this whole file by moving to it to its own package called botapi
 import (
     "fmt"
     "net/http"
+    "context"
+    "github.com/arturoguerra/destinyarena-api/pkg/profiles"
     "github.com/arturoguerra/destinyarena-api/internal/config"
     // "github.com/arturoguerra/destinyarena-api/pkg/bot"
 )
@@ -50,7 +52,11 @@ func postToBot(uid string) error {
 
 func insertUser(u *User) (err error, alt bool) {
     log.Debugln(u)
-    err, _ = dbclient.RegisterUser(u.Discord, u.Bungie, u.Faceit)
+    _ , err = uClient.CreateProfile(context.Background(), &profiles.ProfileRequest{
+        Discord: u.Discord,
+        Bungie: u.Bungie,
+        Faceit: u.Faceit,
+    })
     if err != nil {
         return err, true
     }
