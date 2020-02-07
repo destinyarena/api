@@ -19,15 +19,13 @@ func main() {
     log.Infoln("Starting Destiny Arena API")
     e := echo.New()
 
-    // Logs HTTP Requests
-    e.Use(middleware.Logger())
     // Recover Application from a panic anywhere in the chain
     e.Use(middleware.Recover())
 
     g := e.Group("/api", middleware.Logger())
 
-    go oauth.New(g)
-    go registration.New(g)
+    oauth.New(g)
+    registration.New(g)
 
     e.GET("/", func(c echo.Context) error {
         return c.String(http.StatusOK, "destinyarena api base")

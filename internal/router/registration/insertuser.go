@@ -1,19 +1,13 @@
 package registration
 
-/*
-This inserts new users into the database and returns errors if an alt tries to register
-
-TODO: Fix this whole file by moving to it to its own package called botapi
-*/
-
-
 import (
     "fmt"
     "net/http"
     "context"
+    "google.golang.org/grpc"
     "github.com/arturoguerra/destinyarena-api/pkg/profiles"
     "github.com/arturoguerra/destinyarena-api/internal/config"
-    // "github.com/arturoguerra/destinyarena-api/pkg/bot"
+    pb "github.com/arturoguerra/destinyarena-api/pkg/profiles"
 )
 
 var botcfg = config.LoadBotConfig()
@@ -51,8 +45,17 @@ func postToBot(uid string) error {
 }
 
 func insertUser(u *User) (err error, alt bool) {
-    log.Debugln(u)
-    _ , err = uClient.CreateProfile(context.Background(), &profiles.ProfileRequest{
+    grpcfg := config.LoadGRPConfig()
+    addr := fmt.Sprintf("%s:%s", grpcfg.ProfilesHost, grpcfg.ProfilesPort)
+    conn, err := grpc.Dial(addr, grpc.WithInsecure())
+    if err != nil {
+        return err, false
+    }
+
+    defer conn.Close()
+
+    client := pb.NewProfilesClient(conn)
+    _ , err = client.CreateProfile(context.Background(), &profiles.ProfileRequest{
         Discord: u.Discord,
         Bungie: u.Bungie,
         Faceit: u.Faceit,
