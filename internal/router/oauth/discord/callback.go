@@ -135,6 +135,14 @@ func Callback(c echo.Context) (err error) {
         return c.String(http.StatusInternalServerError, "Bungie API is probably down again")
     }
 
+    err, ok := checkGuilds(accessToken)
+    if !ok {
+        return c.String(http.StatusUnauthorized, "Please join our server before attempting to register")
+    } else if err != nil {
+        log.Error(err)
+        return c.String(http.StatusInternalServerError, "Well rip again")
+    }
+
     claims := &Claims{
         User: *user,
         StandardClaims: jwt.StandardClaims{
