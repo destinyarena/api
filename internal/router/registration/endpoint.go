@@ -75,5 +75,7 @@ func endpoint(c echo.Context) (err error) {
         return c.String(http.StatusInternalServerError, "Well something went wrong while adding a new user")
     }
 
+    sendtoBot(user)
+
     return c.String(http.StatusOK, "You have successfully registered")
 }
