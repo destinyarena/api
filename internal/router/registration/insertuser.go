@@ -1,7 +1,6 @@
 package registration
 
 import (
-    "fmt"
     "context"
     "google.golang.org/grpc"
     "github.com/arturoguerra/destinyarena-api/pkg/profiles"
@@ -14,8 +13,7 @@ var secrets = config.LoadSecrets()
 
 func insertUser(u *User) (err error, alt bool) {
     grpcfg := config.LoadGRPConfig()
-    addr := fmt.Sprintf("%s:%s", grpcfg.ProfilesHost, grpcfg.ProfilesPort)
-    conn, err := grpc.Dial(addr, grpc.WithInsecure())
+    conn, err := grpc.Dial(grpcfg.Profiles, grpc.WithInsecure())
     if err != nil {
         return err, false
     }
