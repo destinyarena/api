@@ -15,6 +15,7 @@ import (
 
     "github.com/arturoguerra/destinyarena-api/internal/router/oauth"
     "github.com/arturoguerra/destinyarena-api/internal/router/registration"
+    "github.com/arturoguerra/destinyarena-api/internal/router/users"
 )
 
 const (
@@ -52,6 +53,7 @@ func main() {
     g := e.Group("/api", middleware.Logger())
 
     oauth.New(g)
+    users.New(g)
     registration.New(g, nchan)
 
     e.GET("/", func(c echo.Context) error {

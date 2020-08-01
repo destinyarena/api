@@ -1,19 +1,18 @@
 package bot
 
 import (
-    "net/http"
+	"net/http"
 )
 
 type Bot struct {
-    Base    string
-    Client *http.Client
+	Base   string
+	Client *http.Client
 }
 
-
 func New(token, base string) *Bot {
-    client := newClient(token)
-    return &Bot{
-        client,
-        base,
-    }
+	client := newClient(token)
+	return &Bot{
+		Client: client,
+		Base:   base,
+	}
 }

@@ -230,7 +230,7 @@ func init() {
 func init() { proto.RegisterFile("profiles.proto", fileDescriptor_9610db3cccb08234) }
 
 var fileDescriptor_9610db3cccb08234 = []byte{
-	// 264 bytes of a gzipped FileDescriptorProto
+	// 285 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x28, 0xca, 0x4f,
 	0xcb, 0xcc, 0x49, 0x2d, 0xd6, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x80, 0xf1, 0x95, 0xa4,
 	0xb9, 0x38, 0x3d, 0x53, 0x82, 0x52, 0x0b, 0x4b, 0x53, 0x8b, 0x4b, 0x84, 0xf8, 0xb8, 0x98, 0x32,
@@ -241,13 +241,14 @@ var fileDescriptor_9610db3cccb08234 = []byte{
 	0x2c, 0x91, 0x60, 0x86, 0x88, 0x43, 0x78, 0x4a, 0x0d, 0x8c, 0x5c, 0x3c, 0x70, 0xc3, 0x0b, 0x72,
 	0x2a, 0xd1, 0x5d, 0x81, 0x6c, 0x15, 0x13, 0x2e, 0xab, 0x98, 0x71, 0x58, 0xc5, 0x82, 0x6c, 0x15,
 	0x58, 0x7d, 0x62, 0x5e, 0x5e, 0x6a, 0x8a, 0x04, 0xab, 0x02, 0xa3, 0x06, 0x47, 0x10, 0x94, 0x67,
-	0xb4, 0x94, 0x89, 0x0b, 0x1e, 0x22, 0x42, 0xd6, 0x5c, 0x5c, 0xee, 0xa9, 0x25, 0x50, 0x17, 0x09,
+	0xf4, 0x84, 0x89, 0x0b, 0x1e, 0x22, 0x42, 0xd6, 0x5c, 0x5c, 0xee, 0xa9, 0x25, 0x50, 0x17, 0x09,
 	0x09, 0xeb, 0xc1, 0x83, 0x0e, 0x1e, 0x4e, 0x52, 0x62, 0x08, 0x41, 0x64, 0x97, 0x2b, 0x31, 0x08,
-	0x39, 0x73, 0xf1, 0x3a, 0x17, 0xa5, 0x26, 0x96, 0xa4, 0xc2, 0xf4, 0x4b, 0x60, 0x51, 0x4a, 0xc8,
-	0x10, 0x73, 0x2e, 0xde, 0xa0, 0xd4, 0xdc, 0xfc, 0xb2, 0x54, 0xbc, 0x8e, 0xe0, 0x47, 0x08, 0x42,
-	0x22, 0x89, 0x41, 0x48, 0x97, 0x8b, 0xd9, 0x29, 0x31, 0x8f, 0x68, 0xe5, 0xfa, 0x5c, 0xac, 0xa1,
-	0x79, 0x49, 0xc4, 0x6b, 0x48, 0x62, 0x03, 0xa7, 0x1e, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0x9b, 0x64, 0x09, 0x2c, 0x4f, 0x02, 0x00, 0x00,
+	0xd9, 0x72, 0xf1, 0xb9, 0xa7, 0x96, 0x38, 0xe6, 0xe4, 0x04, 0xc0, 0x8c, 0xe3, 0x47, 0xa8, 0x05,
+	0x87, 0x25, 0x6e, 0xcd, 0x06, 0x8c, 0x42, 0xce, 0x5c, 0xbc, 0xce, 0x45, 0xa9, 0x89, 0x25, 0xa9,
+	0x30, 0xeb, 0x25, 0xb0, 0x28, 0x26, 0xe4, 0x06, 0x73, 0x2e, 0xde, 0xa0, 0xd4, 0xdc, 0xfc, 0xb2,
+	0x54, 0xbc, 0x7e, 0x40, 0x77, 0x97, 0x12, 0x83, 0x90, 0x2e, 0x17, 0xb3, 0x53, 0x62, 0x1e, 0xd1,
+	0xca, 0xf5, 0xb9, 0x58, 0x43, 0xf3, 0x92, 0x88, 0xd7, 0x90, 0xc4, 0x06, 0x4e, 0x7c, 0xc6, 0x80,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xf4, 0x2a, 0xdc, 0x67, 0x8e, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -263,6 +264,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ProfilesClient interface {
 	GetProfile(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*ProfileReply, error)
+	GetAllProfiles(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Profiles_GetAllProfilesClient, error)
 	CreateProfile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*ProfileReply, error)
 	RemoveProfile(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Empty, error)
 	Ban(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*Empty, error)
@@ -284,6 +286,38 @@ func (c *profilesClient) GetProfile(ctx context.Context, in *IdRequest, opts ...
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *profilesClient) GetAllProfiles(ctx context.Context, in *Empty, opts ...grpc.CallOption) (Profiles_GetAllProfilesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_Profiles_serviceDesc.Streams[0], "/profiles.profiles/GetAllProfiles", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &profilesGetAllProfilesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type Profiles_GetAllProfilesClient interface {
+	Recv() (*ProfileReply, error)
+	grpc.ClientStream
+}
+
+type profilesGetAllProfilesClient struct {
+	grpc.ClientStream
+}
+
+func (x *profilesGetAllProfilesClient) Recv() (*ProfileReply, error) {
+	m := new(ProfileReply)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *profilesClient) CreateProfile(ctx context.Context, in *ProfileRequest, opts ...grpc.CallOption) (*ProfileReply, error) {
@@ -325,6 +359,7 @@ func (c *profilesClient) Unban(ctx context.Context, in *IdRequest, opts ...grpc.
 // ProfilesServer is the server API for Profiles service.
 type ProfilesServer interface {
 	GetProfile(context.Context, *IdRequest) (*ProfileReply, error)
+	GetAllProfiles(*Empty, Profiles_GetAllProfilesServer) error
 	CreateProfile(context.Context, *ProfileRequest) (*ProfileReply, error)
 	RemoveProfile(context.Context, *IdRequest) (*Empty, error)
 	Ban(context.Context, *IdRequest) (*Empty, error)
@@ -337,6 +372,9 @@ type UnimplementedProfilesServer struct {
 
 func (*UnimplementedProfilesServer) GetProfile(ctx context.Context, req *IdRequest) (*ProfileReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (*UnimplementedProfilesServer) GetAllProfiles(req *Empty, srv Profiles_GetAllProfilesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetAllProfiles not implemented")
 }
 func (*UnimplementedProfilesServer) CreateProfile(ctx context.Context, req *ProfileRequest) (*ProfileReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateProfile not implemented")
@@ -371,6 +409,27 @@ func _Profiles_GetProfile_Handler(srv interface{}, ctx context.Context, dec func
 		return srv.(ProfilesServer).GetProfile(ctx, req.(*IdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _Profiles_GetAllProfiles_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(Empty)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(ProfilesServer).GetAllProfiles(m, &profilesGetAllProfilesServer{stream})
+}
+
+type Profiles_GetAllProfilesServer interface {
+	Send(*ProfileReply) error
+	grpc.ServerStream
+}
+
+type profilesGetAllProfilesServer struct {
+	grpc.ServerStream
+}
+
+func (x *profilesGetAllProfilesServer) Send(m *ProfileReply) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _Profiles_CreateProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -470,6 +529,12 @@ var _Profiles_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Profiles_Unban_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetAllProfiles",
+			Handler:       _Profiles_GetAllProfiles_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "profiles.proto",
 }
